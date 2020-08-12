@@ -106,6 +106,7 @@
             $("#recent-searches").empty();
             for (var i=0; i<searchHistory.length; i++){
                 var a = $("<button>");
+                a.attr("data-name", searchHistory[i]);
                 a.attr("class", "button  city");
                 a.attr("data-name", searchHistory[i]);
                 a.text(searchHistory[i]);
