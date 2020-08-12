@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+    <title>Page Title</title>
+    <meta name='viewport' content='width=device-width, initial-scale=1'>
+    <link rel='stylesheet' type='text/css' media='screen' href='style.css'>
+    <!-- <script src='main.js'></script> -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.27.0/moment.min.js" integrity="sha512-rmZcZsyhe0/MAjquhTgiUcb4d9knaFc7b5xAfju483gbEXTkeJRUMIPk6s3ySZMYUHEcjKbjLjyddGWMrNEvZg==" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class = "container-fluid">
+        <div class = "row">
+            <div class = "col">
+                <h1 id= "appHeading">Weather Dashboard</h1>
+            </div>
+        </div>
+        
+        <div class = "row">
+            <!-- Left panel for search input and recent search history -->
+            <div class = "col-md-4">
+              <p>Search for a City:</p>
+              <form class="form-inline">
+                <div class="form-group">
+                  <input type="text" class="form-control" id="city-input" placeholder="Las Vegas">
+                </div>
+               <button type="input" class="btn btn-primary button" id="search"><span class="glyphicon glyphicon-search" aria-hidden="true"></span></button>
+              </form>
+              <br>
+              <!-- Recently Searched Cities go here -->
+              <div id = "recent-searches">
+
+              </div>    
+            </div>
+            <!-- Right panel for weather details  -->
+            <div class = "col-md-8">
+                <!-- This is where we will display the current weather for the selected city -->
+
+                        <div class = "current-conditions border border-secondary">
+                            <h2><span id="current-city"></span></h2>
+                            <ul>
+                            <div class = "tempF"></div>
+                            <div class = "humidity"></div>
+                            <div class="wind-speed"></div>
+                            <div class = "uv-index">
+                                <span id = "uv-index"></span>
+                            </div>
+                            </ul>
+                        </div>
+
+                <!-- This is where we will display the 5 day forecast -->
+                    <div class = "forecast">
+                        <div id= "row">
+                            <h2><span id="5-day-forecast"></span></h2>
+                        </div>
+                        <div id = "row">
+                            <div id = "col" class="daily bg-primary">
+                                <div id = "day-1-date"></div>
+                                <div id = "day-1-icon"></div>
+                                <div id = "day-1-temp"></div>
+                                <div id = "day-1-humidity"></div>
+                            </div>
+                            <div id = "col" class="daily bg-primary">
+                                <div id = "day-2-date"></div>
+                                <div id = "day-2-icon"></div>
+                                <div id = "day-2-temp"></div>
+                                <div id = "day-2-humidity"></div>
+                            </div>
+                            <div id = "col" class="daily bg-primary">
+                                <div id = "day-3-date"></div>
+                                <div id = "day-3-icon"></div>
+                                <div id = "day-3-temp"></div>
+                                <div id = "day-3-humidity"></div>
+                            </div>
+                            <div id = "col" class="daily bg-primary">
+                                <div id = "day-4-date"></div>
+                                <div id = "day-4-icon"></div>
+                                <div id = "day-4-temp"></div>
+                                <div id = "day-4-humidity"></div>
+                            </div>
+                            <div id = "col" class="daily bg-primary">
+                                <div id = "day-5-date"></div>
+                                <div id = "day-5-icon"></div>
+                                <div id = "day-5-temp"></div>
+                                <div id = "day-5-humidity"></div>
+                            </div>
+                        </div>
+                    </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        //var searchBtn = $("#search");
+        var recentlySearchedArray = [];
+        var apiKey = "&appid=166a433c57516f51dfab1f7edaed8413";
+//        var lat = JSON.parse(localStorage.getItem("lastLat"));
+//        var lon = JSON.parse(localStorage.getItem("lastLon"));
+
+        function renderButtons(){
+            //set default value if array is empty
+            var searchHistory = JSON.parse(localStorage.getItem("searchHistory")) || [];
+            $("#recent-searches").empty();
+            for (var i=0; i<searchHistory.length; i++){
+                var a = $("<button>");
+                a.attr("class", "button  city");
+                a.attr("data-name", searchHistory[i]);
+                a.text(searchHistory[i]);
+                $("#recent-searches").append(a);
+                
+            }
+            
+        }
+                
+
+        function displayCurrentWeather(){
+            
+            var city = $(this).attr("data-name");
+            
+            var currentURL = "https://api.openweathermap.org/data/2.5/weather?q=" + city + apiKey;
+        
+            $.ajax({
+                url: currentURL,
+                method: "GET"
+            }).then(function(response){
+
+                var today = moment().format("l");
+                var tempF = (response.main.temp - 273.15) * 1.80 + 32;
+
+                $("#current-city").html(response.name + " " + today); 
+                $(".tempF").text("Temperature: " + tempF.toFixed(2));
+                $(".humidity").text("Humidity: "+ response.main.humidity + "%");
+                $(".wind-speed").text("Wind Speed: " + response.wind.speed + " MPH");
+                var icon = (response.weather[0].icon);
+                var iconURL = "http://openweathermap.org/img/wn/" + icon + ".png";
+                var currentIcon = $("<img>").attr("src", iconURL);
+                $("#current-city").append(currentIcon);
+                
+                localStorage.setItem ("lastLat", JSON.stringify(response.coord.lat));
+                localStorage.setItem ("lastLon", JSON.stringify(response.coord.lon));
+                localStorage.setItem ("lastSearchedCity", JSON.stringify(response.name));
+                
+
+                var lat = JSON.parse(localStorage.getItem("lastLat"));
+            var lon = JSON.parse(localStorage.getItem("lastLon"));
+            var fivedayURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&exclude=hourly,minutely" + apiKey;
+                
+
+
+            $.ajax({
+               url: fivedayURL,
+               method: "GET"
+            }).then(function(res){
+               $(".uv-index").text("UV Index: " + res.current.uvi);
+               var day1temp = res.daily[1].temp.day; 
+               var day2temp = res.daily[2].temp.day;
+               var day3temp = res.daily[3].temp.day;
+               var day4temp = res.daily[4].temp.day;
+               var day5temp = res.daily[5].temp.day;
+               $("#day-1-temp").text("Temp: " + day1temp + "F");
+               $("#day-2-temp").text("Temp: " + day2temp + "F");
+               $("#day-3-temp").text("Temp: " + day3temp + "F");
+               $("#day-4-temp").text("Temp: " + day4temp + "F");
+               $("#day-5-temp").text("Temp: " + day5temp + "F");
+
+            
+               var day1icon = (res.daily[1].weather[0].icon);
+               var day2icon = (res.daily[2].weather[0].icon);
+               var day3icon = (res.daily[3].weather[0].icon);
+               var day4icon = (res.daily[4].weather[0].icon);
+               var day5icon = (res.daily[5].weather[0].icon);
+               var day1iconURL = "http://openweathermap.org/img/wn/" + day1icon + ".png";
+               var day2iconURL = "http://openweathermap.org/img/wn/" + day2icon + ".png";
+               var day3iconURL = "http://openweathermap.org/img/wn/" + day3icon + ".png";
+               var day4iconURL = "http://openweathermap.org/img/wn/" + day4icon + ".png";
+               var day5iconURL = "http://openweathermap.org/img/wn/" + day5icon + ".png";
+               var day1img = $("<img>").attr("src", day1iconURL);
+               var day2img = $("<img>").attr("src", day2iconURL);
+               var day3img = $("<img>").attr("src", day3iconURL);
+               var day4img = $("<img>").attr("src", day4iconURL);
+               var day5img = $("<img>").attr("src", day5iconURL);
+
+               $("#day-1-icon").html(day1img);
+               $("#day-2-icon").html(day2img);
+               $("#day-3-icon").html(day3img);
+               $("#day-4-icon").html(day4img);
+               $("#day-5-icon").html(day5img);
+
+
+
+               var day1humidity = res.daily[1].humidity; 
+               var day2humidity = res.daily[2].humidity;
+               var day3humidity = res.daily[3].humidity;
+               var day4humidity = res.daily[4].humidity;
+               var day5humidity = res.daily[5].humidity;
+               $("#day-1-humidity").text("Humidity: " + day1humidity + "%");
+               $("#day-2-humidity").text("Humidity: " + day2humidity + "%");
+               $("#day-3-humidity").text("Humidity: " + day3humidity + "%");
+               $("#day-4-humidity").text("Humidity: " + day4humidity + "%");
+               $("#day-5-humidity").text("Humidity: " + day5humidity + "%");
+
+
+               var day1 = moment().add(1, 'days').format("l");
+               var day2 = moment().add(2, 'days').format("l");
+               var day3 = moment().add(3, 'days').format("l");
+               var day4 = moment().add(4, 'days').format("l");
+               var day5 = moment().add(5, 'days').format("l");                   
+               $("#day-1-date").text(day1);
+               $("#day-2-date").text(day2);
+               $("#day-3-date").text(day3);
+               $("#day-4-date").text(day4);
+               $("#day-5-date").text(day5);
+            });
+
+
+
+
+
+
+            });
+            
+                //keep these global for other ajax calls
+            
+        }
+
+          
+
+
+        $("#search").on("click", function(event){
+            event.preventDefault();
+            var cityInput = $("#city-input").val().trim();
+            $("#search").attr("data-name", cityInput);
+            localStorage.setItem ("lastSearchedCity", JSON.stringify(cityInput));
+            var searchHistory = JSON.parse(localStorage.getItem('searchHistory')) || [];
+            searchHistory.push(cityInput);
+            localStorage.setItem("searchHistory", JSON.stringify(searchHistory));
+            renderButtons();
+        }
+        );
+
+        var lastSearchedCity = JSON.parse(localStorage.getItem('lastSearchedCity'));
+
+        function getLastWeatherSearch(){
+            var currentURL = "https://api.openweathermap.org/data/2.5/weather?q=" + lastSearchedCity + apiKey;
+    
+            $.ajax({
+                url: currentURL,
+                method: "GET"
+            }).then(function(response){
+
+                var today = moment().format("l");
+                var tempF = (response.main.temp - 273.15) * 1.80 + 32;
+
+                $("#current-city").html(response.name + " " + today); 
+                $(".tempF").text("Temperature: " + tempF.toFixed(2));
+                $(".humidity").text("Humidity: "+ response.main.humidity + "%");
+                $(".wind-speed").text("Wind Speed: " + response.wind.speed + " MPH");
+                var icon = (response.weather[0].icon);
+                var iconURL = "http://openweathermap.org/img/wn/" + icon + ".png";
+                var currentIcon = $("<img>").attr("src", iconURL);
+                $("#current-city").append(currentIcon);
+                
+                localStorage.setItem ("lastLat", JSON.stringify(response.coord.lat));
+                localStorage.setItem ("lastLon", JSON.stringify(response.coord.lon));
+                localStorage.setItem ("lastSearchedCity", JSON.stringify(response.name));
+                
+
+                var lat = JSON.parse(localStorage.getItem("lastLat"));
+            var lon = JSON.parse(localStorage.getItem("lastLon"));
+            var fivedayURL = "https://api.openweathermap.org/data/2.5/onecall?lat=" + lat + "&lon=" + lon + "&units=imperial&exclude=hourly,minutely" + apiKey;
+                
+
+
+            $.ajax({
+               url: fivedayURL,
+               method: "GET"
+            }).then(function(res){
+               $(".uv-index").text("UV Index: " + res.current.uvi);
+               var day1temp = res.daily[1].temp.day; 
+               var day2temp = res.daily[2].temp.day;
+               var day3temp = res.daily[3].temp.day;
+               var day4temp = res.daily[4].temp.day;
+               var day5temp = res.daily[5].temp.day;
+               $("#day-1-temp").text("Temp: " + day1temp + "F");
+               $("#day-2-temp").text("Temp: " + day2temp + "F");
+               $("#day-3-temp").text("Temp: " + day3temp + "F");
+               $("#day-4-temp").text("Temp: " + day4temp + "F");
+               $("#day-5-temp").text("Temp: " + day5temp + "F");
+
+            
+               var day1icon = (res.daily[1].weather[0].icon);
+               var day2icon = (res.daily[2].weather[0].icon);
+               var day3icon = (res.daily[3].weather[0].icon);
+               var day4icon = (res.daily[4].weather[0].icon);
+               var day5icon = (res.daily[5].weather[0].icon);
+               var day1iconURL = "http://openweathermap.org/img/wn/" + day1icon + ".png";
+               var day2iconURL = "http://openweathermap.org/img/wn/" + day2icon + ".png";
+               var day3iconURL = "http://openweathermap.org/img/wn/" + day3icon + ".png";
+               var day4iconURL = "http://openweathermap.org/img/wn/" + day4icon + ".png";
+               var day5iconURL = "http://openweathermap.org/img/wn/" + day5icon + ".png";
+               var day1img = $("<img>").attr("src", day1iconURL);
+               var day2img = $("<img>").attr("src", day2iconURL);
+               var day3img = $("<img>").attr("src", day3iconURL);
+               var day4img = $("<img>").attr("src", day4iconURL);
+               var day5img = $("<img>").attr("src", day5iconURL);
+
+               $("#day-1-icon").html(day1img);
+               $("#day-2-icon").html(day2img);
+               $("#day-3-icon").html(day3img);
+               $("#day-4-icon").html(day4img);
+               $("#day-5-icon").html(day5img);
+
+
+
+               var day1humidity = res.daily[1].humidity; 
+               var day2humidity = res.daily[2].humidity;
+               var day3humidity = res.daily[3].humidity;
+               var day4humidity = res.daily[4].humidity;
+               var day5humidity = res.daily[5].humidity;
+               $("#day-1-humidity").text("Humidity: " + day1humidity + "%");
+               $("#day-2-humidity").text("Humidity: " + day2humidity + "%");
+               $("#day-3-humidity").text("Humidity: " + day3humidity + "%");
+               $("#day-4-humidity").text("Humidity: " + day4humidity + "%");
+               $("#day-5-humidity").text("Humidity: " + day5humidity + "%");
+
+
+               var day1 = moment().add(1, 'days').format("l");
+               var day2 = moment().add(2, 'days').format("l");
+               var day3 = moment().add(3, 'days').format("l");
+               var day4 = moment().add(4, 'days').format("l");
+               var day5 = moment().add(5, 'days').format("l");                   
+               $("#day-1-date").text(day1);
+               $("#day-2-date").text(day2);
+               $("#day-3-date").text(day3);
+               $("#day-4-date").text(day4);
+               $("#day-5-date").text(day5);
+            });
+
+
+
+
+
+
+            });
+            
+                //keep these global for other ajax calls
+            
+        }
+        
+        //this works for search button because it has a button class
+        $(document).on("click", ".button", displayCurrentWeather);
+        $(document).ready(renderButtons);
+        $(document).ready(getLastWeatherSearch);
+
+        
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    </script>
+
+</body>
+</html>
