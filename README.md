@@ -1,8 +1,5 @@
 # WeatherDashboard
 
-# WeatherDashboard
-
-
 This homework assignment was to use a third party API to dynamically generate a Weather Dashboard app.
 
 
