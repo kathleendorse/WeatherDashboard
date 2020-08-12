@@ -1,0 +1,24 @@
+#appHeading {
+    background-color:#505050;
+    color: white;
+    height: 75px;
+    text-align: center;
+    padding: 20px;
+}
+
+.current-conditions{
+    line-height: 2.5;
+    border-style: solid;
+    border: 20px;
+    border-color: grey;
+    height: 300px;
+    
+}
+
+.daily{
+    margin: 5px;
+    border: 5px;
+    padding: 5px;
+    float: left;
+}
+
