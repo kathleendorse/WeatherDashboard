@@ -15,4 +15,4 @@ https://openweathermap.org/api/
 
 ## Visualization of App Interface
 
-<img src="https://github.com/nrouhanizdeh/Night-In-App/blob/master/images/Night-In%20(5).gif?raw=true"></img>
+<img src="https://github.com/kathleendorse/WeatherDashboard/blob/master/WeatherDashboardGif.gif"></img>
