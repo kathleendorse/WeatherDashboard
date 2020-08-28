@@ -9,9 +9,9 @@ https://kathleendorse.github.io/WeatherDashboard/
 
 ## Technologies Utilized
 
-```
+
 https://openweathermap.org/api/
-```
+
 
 ## Visualization of App Interface
 
